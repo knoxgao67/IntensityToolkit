@@ -57,7 +57,7 @@ func TestIntensitySegments_Add_Normal3(t *testing.T) {
 	checkSegmentsValue(t, s, [][]int64{})
 }
 
-func TestIntensitySegments_Set_Normal1(t *testing.T) {
+func TestIntensitySegments_SetAndQuery_Normal1(t *testing.T) {
 	s := NewIntensitySegments()
 	checkSegmentsValue(t, s, [][]int64{})
 
@@ -75,6 +75,12 @@ func TestIntensitySegments_Set_Normal1(t *testing.T) {
 
 	s.Set(50, 100, 1)
 	checkSegmentsValue(t, s, [][]int64{{10, 1}, {20, 2}, {30, 1}, {40, 0}, {50, 1}, {100, 0}})
+
+	require.EqualValues(t, 1, s.Query(15))
+	require.EqualValues(t, 0, s.Query(-10))
+	require.EqualValues(t, 0, s.Query(1000))
+	require.EqualValues(t, 1, s.Query(35))
+	require.EqualValues(t, 0, s.Query(45))
 
 }
 

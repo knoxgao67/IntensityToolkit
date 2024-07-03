@@ -64,6 +64,17 @@ func (s *IntensitySegments) GetAllValues() [][]int64 {
 	return list
 }
 
+func (s *IntensitySegments) Query(idx int64) int64 {
+	curNode, ok := s.underlying.Floor(idx)
+	if !ok {
+		panic("error, can't find the segment")
+	}
+	if curNode.Value.To < idx {
+		return 0
+	}
+	return curNode.Value.Amount
+}
+
 // baseOperate 处理区间段更新，
 // amountUpdater 用于处理 重复区间段的更新逻辑，因为set和add的逻辑不同，固抽出这个function交由各自实现.
 func (s *IntensitySegments) baseOperate(from, to, amount int64, amountUpdater func(amount int64) int64) {
