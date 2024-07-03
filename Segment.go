@@ -12,9 +12,6 @@ func NewSegment(from, to, amount int64) *Segment {
 	if from >= to {
 		return nil
 	}
-	if amount == 0 {
-		return nil
-	}
 	return &Segment{
 		From:   from,
 		To:     to,
@@ -71,6 +68,7 @@ func (so *SegmentOperatorCache) Merge() {
 			cur = seg
 		}
 	}
+	segs = append(segs, cur)
 
 	so.createSegs = segs
 

@@ -27,6 +27,9 @@ func NewIntensitySegments() *IntensitySegments {
 
 func (s *IntensitySegments) Add(from, to, amount int64) {
 	s.baseOperate(from, to, amount, func(curAmount int64) int64 {
+		if curAmount+amount < amount {
+			panic("overflow as the amount is too large")
+		}
 		return curAmount + amount
 	})
 }
@@ -48,8 +51,13 @@ func (s *IntensitySegments) GetAllValues() [][]int64 {
 	}
 	iter := s.underlying.Iterator()
 	iter.Next() // 这里的目的是跳过哨兵
+	prev := iter.Value()
 	for iter.Next() {
+		if prev.From != math.MinInt64 && prev.To < iter.Value().From {
+			list = append(list, []int64{prev.To, 0})
+		}
 		list = append(list, []int64{iter.Value().From, iter.Value().Amount})
+		prev = iter.Value()
 	}
 	iter.Prev()
 	list = append(list, []int64{iter.Value().To, 0})
@@ -108,7 +116,7 @@ func (s *IntensitySegments) baseOperate(from, to, amount int64, amountUpdater fu
 	}
 
 	if tmpFrom < to {
-		segOper.Create(NewSegment(tmpFrom, to, 0))
+		segOper.Create(NewSegment(tmpFrom, to, amountUpdater(0)))
 	}
 
 	segOper.Merge()
@@ -151,5 +159,25 @@ func (s *IntensitySegments) merge(from, to int64) {
 	// 将重复的segment删除
 	for _, key := range needDeleteKeys {
 		s.underlying.Remove(key)
+	}
+
+	// 最前和最后的0需要移除
+	for s.underlying.Size() > 1 {
+		iter := s.underlying.Iterator()
+		iter.First()
+		iter.Next()
+		if iter == nil || iter.Value().Amount != 0 {
+			break
+		}
+		s.underlying.Remove(iter.Value().From)
+	}
+
+	for s.underlying.Size() > 1 {
+		iter := s.underlying.Iterator()
+		iter.Last()
+		if iter.Value() == nil || iter.Value().Amount != 0 {
+			break
+		}
+		s.underlying.Remove(iter.Value().From)
 	}
 }
