@@ -10,7 +10,8 @@ import (
 // IntensitySegments 强度区间段
 // notice:
 //
-//	这个区间段struct，用了一个最小值做标记位，所以，可以支持的区间段值为 [math.MinInt64+1, math.MaxInt64)
+//		1.这个区间段struct，用了一个最小值做标记位，所以，可以支持的区间段值为 [math.MinInt64+1, math.MaxInt64)
+//	 	2. 非并发安全
 type IntensitySegments struct {
 	// 内部实现是区间红黑数，key是区间段的左端点
 	// 利用红黑树特性，可以再O(logN)时间内进行查找和更新
