@@ -6,7 +6,7 @@ import (
 )
 
 func TestSegmentOperatorCache_Merge(t *testing.T) {
-	segOper := NewSegmentOperatorCache()
+	segOper := newSegmentOperatorCache()
 	segOper.Create(
 		NewSegment(10, 20, 1),
 		NewSegment(20, 30, 1),
@@ -16,7 +16,7 @@ func TestSegmentOperatorCache_Merge(t *testing.T) {
 	require.EqualValues(t, []*Segment{{10, 50, 1}}, segOper.createSegs)
 	require.NotEmpty(t, 3, len(segOper.deleteKeys))
 
-	segOper = NewSegmentOperatorCache()
+	segOper = newSegmentOperatorCache()
 	segOper.Create(
 		NewSegment(10, 20, 1),
 		NewSegment(20, 30, 2),

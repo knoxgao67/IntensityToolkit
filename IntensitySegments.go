@@ -27,7 +27,7 @@ func NewIntensitySegments() *IntensitySegments {
 
 func (s *IntensitySegments) Add(from, to, amount int64) {
 	s.baseOperate(from, to, amount, func(curAmount int64) int64 {
-		if curAmount+amount < amount {
+		if (amount > 0 && curAmount > 0 && curAmount+amount < 0) || (amount < 0 && curAmount < 0 && amount+curAmount > 0) {
 			panic("overflow as the amount is too large")
 		}
 		return curAmount + amount
@@ -91,7 +91,7 @@ func (s *IntensitySegments) baseOperate(from, to, amount int64, amountUpdater fu
 
 	iter := s.underlying.IteratorAt(curNode) // 迭代器
 
-	segOper := NewSegmentOperatorCache()
+	segOper := newSegmentOperatorCache()
 
 	// curNode是前置区间段
 	if curNode.Value.To > from {

@@ -19,30 +19,31 @@ func NewSegment(from, to, amount int64) *Segment {
 	}
 }
 
-type SegmentOperatorCache struct {
+// segmentOperatorCache segOperCache 内部使用，不对外暴露.
+type segmentOperatorCache struct {
 	createSegs []*Segment         // 标记后续需要create的区间
 	deleteKeys map[int64]struct{} // 标记后续需要delete的区间key
 }
 
-func NewSegmentOperatorCache() *SegmentOperatorCache {
-	return &SegmentOperatorCache{
+func newSegmentOperatorCache() *segmentOperatorCache {
+	return &segmentOperatorCache{
 		createSegs: make([]*Segment, 0),
 		deleteKeys: make(map[int64]struct{}),
 	}
 }
 
-func (so *SegmentOperatorCache) Create(list ...*Segment) {
+func (so *segmentOperatorCache) Create(list ...*Segment) {
 	so.createSegs = append(so.createSegs, list...)
 }
 
-func (so *SegmentOperatorCache) Delete(list ...int64) {
+func (so *segmentOperatorCache) Delete(list ...int64) {
 	for _, item := range list {
 		so.deleteKeys[item] = struct{}{}
 	}
 }
 
 // Merge 合并需要创建的区间段.
-func (so *SegmentOperatorCache) Merge() {
+func (so *segmentOperatorCache) Merge() {
 	// 去掉nil，在Add和Set的时候我们可能会加入nil
 	segs := make([]*Segment, 0, len(so.createSegs))
 	for _, item := range so.createSegs {
